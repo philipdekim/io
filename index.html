@@ -17,78 +17,354 @@
             cursor: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" fill="white" opacity="0.3"/><circle cx="12" cy="12" r="3" fill="white"/></svg>'), auto;
         }
 
-        #canvas-container { position: fixed; top: 0; left: 0; width: 100%; height: 100%; }
+        #crosshair {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            width: 14px;
+            height: 14px;
+            transform: translate(-50%, -50%);
+            border: 2px solid rgba(255,255,255,0.9);
+            border-radius: 50%;
+            z-index: 1000;
+            pointer-events: none;
+        }
+
+        #canvas-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+        }
 
         #loading {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: #000; display: flex; flex-direction: column;
-            justify-content: center; align-items: center; z-index: 10000;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: #000;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 10000;
             transition: opacity 1s ease;
         }
-        #loading.hidden { opacity: 0; pointer-events: none; }
-        #loading h1 {
-            font-family: 'Playfair Display', serif; font-size: 4em; font-weight: 900;
-            background: linear-gradient(45deg, #ff6b6b, #4ecdc4, #ffe66d, #a8e6cf);
-            background-size: 300% 300%; -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent; background-clip: text;
-            animation: gradientShift 3s ease infinite; margin-bottom: 30px; letter-spacing: -2px;
+
+        #loading.hidden {
+            opacity: 0;
+            pointer-events: none;
         }
-        @keyframes gradientShift { 0%, 100% { background-position: 0% 50%; } 50% { background-position: 100% 50%; } }
 
-        .loading-bar { width: 300px; height: 4px; background: rgba(255,255,255,0.1); border-radius: 10px; overflow: hidden; margin-top: 20px; }
-        .loading-progress { height: 100%; background: linear-gradient(90deg, #ff6b6b, #4ecdc4); width: 0%; transition: width 0.3s ease; }
-        .loading-text { margin-top: 20px; color: rgba(255,255,255,0.6); font-size: 0.9em; letter-spacing: 2px; }
+        #loading h1 {
+            font-family: 'Playfair Display', serif;
+            font-size: 4em;
+            font-weight: 900;
+            background: linear-gradient(45deg, #ff6b6b, #4ecdc4, #ffe66d, #a8e6cf);
+            background-size: 300% 300%;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            animation: gradientShift 3s ease infinite;
+            margin-bottom: 30px;
+            letter-spacing: -2px;
+        }
 
-        #ui-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 100; }
-        header { position: absolute; top: 0; left: 0; right: 0; padding: 40px 60px; display: flex; justify-content: space-between; align-items: flex-start; pointer-events: auto; }
-        .logo { font-family: 'Playfair Display', serif; font-size: 1.8em; font-weight: 900; letter-spacing: -1px; }
-        .exhibition-info { text-align: right; opacity: 0.8; }
-        .exhibition-info .date { font-size: 0.85em; letter-spacing: 3px; text-transform: uppercase; color: #4ecdc4; }
-        .exhibition-info .location { font-size: 0.9em; margin-top: 5px; font-weight: 300; }
+        @keyframes gradientShift {
+            0%, 100% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+        }
+
+        .loading-bar {
+            width: 300px;
+            height: 4px;
+            background: rgba(255,255,255,0.1);
+            border-radius: 10px;
+            overflow: hidden;
+            margin-top: 20px;
+        }
+
+        .loading-progress {
+            height: 100%;
+            background: linear-gradient(90deg, #ff6b6b, #4ecdc4);
+            width: 100%;
+        }
+
+        .loading-text {
+            margin-top: 20px;
+            color: rgba(255,255,255,0.6);
+            font-size: 0.9em;
+            letter-spacing: 2px;
+        }
+
+        #ui-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 100;
+        }
+
+        header {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            padding: 40px 60px;
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            pointer-events: auto;
+        }
+
+        .logo {
+            font-family: 'Playfair Display', serif;
+            font-size: 1.8em;
+            font-weight: 900;
+            letter-spacing: -1px;
+        }
+
+        .exhibition-info {
+            text-align: right;
+            opacity: 0.8;
+        }
+
+        .exhibition-info .date {
+            font-size: 0.85em;
+            letter-spacing: 3px;
+            text-transform: uppercase;
+            color: #4ecdc4;
+        }
+
+        .exhibition-info .location {
+            font-size: 0.9em;
+            margin-top: 5px;
+            font-weight: 300;
+        }
 
         .controls {
-            position: absolute; bottom: 40px; left: 50%; transform: translateX(-50%);
-            background: rgba(0,0,0,0.7); backdrop-filter: blur(10px);
-            padding: 20px 40px; border-radius: 50px; border: 1px solid rgba(255,255,255,0.1);
-            pointer-events: auto; display: flex; gap: 30px; align-items: center;
+            position: absolute;
+            bottom: 40px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(0,0,0,0.7);
+            backdrop-filter: blur(10px);
+            padding: 20px 40px;
+            border-radius: 50px;
+            border: 1px solid rgba(255,255,255,0.1);
+            pointer-events: auto;
+            display: flex;
+            gap: 30px;
+            align-items: center;
         }
-        .control-item { display: flex; align-items: center; gap: 10px; font-size: 0.85em; }
-        .control-key { background: rgba(255,255,255,0.1); padding: 5px 12px; border-radius: 5px; font-weight: 700; font-size: 0.9em; border: 1px solid rgba(255,255,255,0.2); min-width: 35px; text-align: center; }
+
+        .control-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 0.85em;
+        }
+
+        .control-key {
+            background: rgba(255,255,255,0.1);
+            padding: 5px 12px;
+            border-radius: 5px;
+            font-weight: 700;
+            font-size: 0.9em;
+            border: 1px solid rgba(255,255,255,0.2);
+            min-width: 35px;
+            text-align: center;
+        }
 
         #artwork-info {
-            position: absolute; top: 50%; right: 60px; transform: translateY(-50%);
-            width: 350px; background: rgba(0,0,0,0.85); backdrop-filter: blur(20px);
-            padding: 40px; border-radius: 20px; border: 1px solid rgba(255,255,255,0.1);
-            opacity: 0; pointer-events: none; transition: opacity 0.4s ease, transform 0.4s ease;
+            position: absolute;
+            top: 50%;
+            right: 60px;
+            transform: translateY(-50%);
+            width: 350px;
+            background: rgba(0,0,0,0.85);
+            backdrop-filter: blur(20px);
+            padding: 40px;
+            border-radius: 20px;
+            border: 1px solid rgba(255,255,255,0.1);
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.4s ease, transform 0.4s ease;
         }
-        #artwork-info.visible { opacity: 1; pointer-events: auto; transform: translateY(-50%) translateX(0); }
-        #artwork-info h2 { font-family: 'Playfair Display', serif; font-size: 2em; margin-bottom: 10px; line-height: 1.2; }
-        #artwork-info .date { color: #4ecdc4; font-size: 0.85em; letter-spacing: 2px; margin-bottom: 20px; display: block; }
-        #artwork-info .description { line-height: 1.8; opacity: 0.9; font-weight: 300; }
-        #artwork-info .category { display: inline-block; margin-top: 20px; padding: 8px 16px; background: rgba(78, 205, 196, 0.2); color: #4ecdc4; border-radius: 20px; font-size: 0.8em; letter-spacing: 1px; }
-        .close-info { position: absolute; top: 20px; right: 20px; background: none; border: none; color: #fff; font-size: 1.5em; cursor: pointer; opacity: 0.6; transition: opacity 0.3s ease; pointer-events: auto; }
-        .close-info:hover { opacity: 1; }
 
-        .nav-dots { position: absolute; left: 60px; top: 50%; transform: translateY(-50%); display: flex; flex-direction: column; gap: 15px; pointer-events: auto; }
-        .nav-dot { width: 12px; height: 12px; border-radius: 50%; background: rgba(255,255,255,0.3); cursor: pointer; transition: all 0.3s ease; position: relative; }
-        .nav-dot:hover { background: rgba(255,255,255,0.6); transform: scale(1.3); }
-        .nav-dot.active { background: #4ecdc4; box-shadow: 0 0 20px #4ecdc4; }
-        .nav-dot::after { content: attr(data-title); position: absolute; left: 25px; top: 50%; transform: translateY(-50%); white-space: nowrap; background: rgba(0,0,0,0.9); padding: 5px 15px; border-radius: 5px; font-size: 0.8em; opacity: 0; pointer-events: none; transition: opacity 0.3s ease; }
-        .nav-dot:hover::after { opacity: 1; }
+        #artwork-info.visible {
+            opacity: 1;
+            pointer-events: auto;
+            transform: translateY(-50%) translateX(0);
+        }
 
-        #entrance-guide { position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); text-align: center; z-index: 200; opacity: 1; transition: opacity 1s ease; pointer-events: none; }
-        #entrance-guide.hidden { opacity: 0; }
-        #entrance-guide h2 { font-family: 'Playfair Display', serif; font-size: 3em; margin-bottom: 20px; animation: fadeInUp 1s ease; }
-        #entrance-guide p { font-size: 1.2em; opacity: 0.8; animation: fadeInUp 1s ease 0.3s both; }
-        #entrance-guide .start-button { margin-top: 40px; padding: 15px 40px; background: linear-gradient(135deg, #ff6b6b, #4ecdc4); border: none; border-radius: 30px; color: white; font-size: 1.1em; font-weight: 700; cursor: pointer; pointer-events: auto; animation: fadeInUp 1s ease 0.6s both; transition: transform 0.3s ease, box-shadow 0.3s ease; }
-        #entrance-guide .start-button:hover { transform: translateY(-5px); box-shadow: 0 10px 30px rgba(78, 205, 196, 0.4); }
+        #artwork-info h2 {
+            font-family: 'Playfair Display', serif;
+            font-size: 2em;
+            margin-bottom: 10px;
+            line-height: 1.2;
+        }
 
-        @keyframes fadeInUp { from { opacity: 0; transform: translateY(30px); } to { opacity: 1; transform: translateY(0); } }
+        #artwork-info .date {
+            color: #4ecdc4;
+            font-size: 0.85em;
+            letter-spacing: 2px;
+            margin-bottom: 20px;
+            display: block;
+        }
+
+        #artwork-info .description {
+            line-height: 1.8;
+            opacity: 0.9;
+            font-weight: 300;
+        }
+
+        #artwork-info .category {
+            display: inline-block;
+            margin-top: 20px;
+            padding: 8px 16px;
+            background: rgba(78, 205, 196, 0.2);
+            color: #4ecdc4;
+            border-radius: 20px;
+            font-size: 0.8em;
+            letter-spacing: 1px;
+        }
+
+        .close-info {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: none;
+            border: none;
+            color: #fff;
+            font-size: 1.5em;
+            cursor: pointer;
+            opacity: 0.6;
+            transition: opacity 0.3s ease;
+            pointer-events: auto;
+        }
+
+        .close-info:hover {
+            opacity: 1;
+        }
+
+        .nav-dots {
+            position: absolute;
+            left: 60px;
+            top: 50%;
+            transform: translateY(-50%);
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            pointer-events: auto;
+        }
+
+        .nav-dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: rgba(255,255,255,0.3);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        .nav-dot:hover {
+            background: rgba(255,255,255,0.6);
+            transform: scale(1.3);
+        }
+
+        .nav-dot.active {
+            background: #4ecdc4;
+            box-shadow: 0 0 20px #4ecdc4;
+        }
+
+        .nav-dot::after {
+            content: attr(data-title);
+            position: absolute;
+            left: 25px;
+            top: 50%;
+            transform: translateY(-50%);
+            white-space: nowrap;
+            background: rgba(0,0,0,0.9);
+            padding: 5px 15px;
+            border-radius: 5px;
+            font-size: 0.8em;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s ease;
+        }
+
+        .nav-dot:hover::after {
+            opacity: 1;
+        }
+
+        #entrance-guide {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            text-align: center;
+            z-index: 200;
+            opacity: 1;
+            transition: opacity 1s ease;
+            pointer-events: none;
+        }
+
+        #entrance-guide.hidden {
+            opacity: 0;
+        }
+
+        #entrance-guide h2 {
+            font-family: 'Playfair Display', serif;
+            font-size: 3em;
+            margin-bottom: 20px;
+            animation: fadeInUp 1s ease;
+        }
+
+        #entrance-guide p {
+            font-size: 1.2em;
+            opacity: 0.8;
+            animation: fadeInUp 1s ease 0.3s both;
+        }
+
+        #entrance-guide .start-button {
+            margin-top: 40px;
+            padding: 15px 40px;
+            background: linear-gradient(135deg, #ff6b6b, #4ecdc4);
+            border: none;
+            border-radius: 30px;
+            color: white;
+            font-size: 1.1em;
+            font-weight: 700;
+            cursor: pointer;
+            pointer-events: auto;
+            animation: fadeInUp 1s ease 0.6s both;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        #entrance-guide .start-button:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 30px rgba(78, 205, 196, 0.4);
+        }
+
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
 
         .cursor-glow {
-            position: fixed; width: 300px; height: 300px;
+            position: fixed;
+            width: 300px;
+            height: 300px;
             background: radial-gradient(circle, rgba(78, 205, 196, 0.25) 0%, transparent 70%);
-            pointer-events: none; z-index: 9999; transform: translate(-50%, -50%);
+            pointer-events: none;
+            z-index: 9999;
+            transform: translate(-50%, -50%);
             transition: opacity 0.3s ease;
         }
     </style>
@@ -133,159 +409,7 @@
         <div class="controls">
             <div class="control-item"><span class="control-key">W A S D</span><span>이동</span></div>
             <div class="control-item"><span class="control-key">Q / E</span><span>이전/다음</span></div>
-            <div class="control-item"><span class="control-key">마우스</span><span>둘러보기</span></div>
-            <div class="control-item"><span class="control-key">ESC</span><span>커서 해제</span></div>
-        </div>
-    </div>
-
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
-    <script>
-       <!DOCTYPE html>
-<html lang="ko">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>3-10 학습 나눔</title>
-    <style>
-        @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=Noto+Sans+KR:wght@300;400;700&display=swap');
-
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-
-        body {
-            font-family: 'Noto Sans KR', sans-serif;
-            background: #0a0a0a;
-            color: #fff;
-            overflow: hidden;
-            cursor: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" fill="white" opacity="0.3"/><circle cx="12" cy="12" r="3" fill="white"/></svg>'), auto;
-        }
-  
-        #crosshair {
-            position: fixed;
-            top: 50%;
-            left: 50%;
-            width: 14px;
-            height: 14px;
-            transform: translate(-50%, -50%);
-            border: 2px solid rgba(255,255,255,0.9);
-            border-radius: 50%;
-            z-index: 1000;
-            pointer-events: none;
-        }
- 
-        #canvas-container { position: fixed; top: 0; left: 0; width: 100%; height: 100%; }
-
-        #loading {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: #000; display: flex; flex-direction: column;
-            justify-content: center; align-items: center; z-index: 10000;
-            transition: opacity 1s ease;
-        }
-        #loading.hidden { opacity: 0; pointer-events: none; }
-        #loading h1 {
-            font-family: 'Playfair Display', serif; font-size: 4em; font-weight: 900;
-            background: linear-gradient(45deg, #ff6b6b, #4ecdc4, #ffe66d, #a8e6cf);
-            background-size: 300% 300%; -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent; background-clip: text;
-            animation: gradientShift 3s ease infinite; margin-bottom: 30px; letter-spacing: -2px;
-        }
-        @keyframes gradientShift { 0%, 100% { background-position: 0% 50%; } 50% { background-position: 100% 50%; } }
-
-        .loading-bar { width: 300px; height: 4px; background: rgba(255,255,255,0.1); border-radius: 10px; overflow: hidden; margin-top: 20px; }
-        .loading-progress { height: 100%; background: linear-gradient(90deg, #ff6b6b, #4ecdc4); width: 0%; transition: width 0.3s ease; }
-        .loading-text { margin-top: 20px; color: rgba(255,255,255,0.6); font-size: 0.9em; letter-spacing: 2px; }
-
-        #ui-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 100; }
-        header { position: absolute; top: 0; left: 0; right: 0; padding: 40px 60px; display: flex; justify-content: space-between; align-items: flex-start; pointer-events: auto; }
-        .logo { font-family: 'Playfair Display', serif; font-size: 1.8em; font-weight: 900; letter-spacing: -1px; }
-        .exhibition-info { text-align: right; opacity: 0.8; }
-        .exhibition-info .date { font-size: 0.85em; letter-spacing: 3px; text-transform: uppercase; color: #4ecdc4; }
-        .exhibition-info .location { font-size: 0.9em; margin-top: 5px; font-weight: 300; }
-
-        .controls {
-            position: absolute; bottom: 40px; left: 50%; transform: translateX(-50%);
-            background: rgba(0,0,0,0.7); backdrop-filter: blur(10px);
-            padding: 20px 40px; border-radius: 50px; border: 1px solid rgba(255,255,255,0.1);
-            pointer-events: auto; display: flex; gap: 30px; align-items: center;
-        }
-        .control-item { display: flex; align-items: center; gap: 10px; font-size: 0.85em; }
-        .control-key { background: rgba(255,255,255,0.1); padding: 5px 12px; border-radius: 5px; font-weight: 700; font-size: 0.9em; border: 1px solid rgba(255,255,255,0.2); min-width: 35px; text-align: center; }
-
-        #artwork-info {
-            position: absolute; top: 50%; right: 60px; transform: translateY(-50%);
-            width: 350px; background: rgba(0,0,0,0.85); backdrop-filter: blur(20px);
-            padding: 40px; border-radius: 20px; border: 1px solid rgba(255,255,255,0.1);
-            opacity: 0; pointer-events: none; transition: opacity 0.4s ease, transform 0.4s ease;
-        }
-        #artwork-info.visible { opacity: 1; pointer-events: auto; transform: translateY(-50%) translateX(0); }
-        #artwork-info h2 { font-family: 'Playfair Display', serif; font-size: 2em; margin-bottom: 10px; line-height: 1.2; }
-        #artwork-info .date { color: #4ecdc4; font-size: 0.85em; letter-spacing: 2px; margin-bottom: 20px; display: block; }
-        #artwork-info .description { line-height: 1.8; opacity: 0.9; font-weight: 300; }
-        #artwork-info .category { display: inline-block; margin-top: 20px; padding: 8px 16px; background: rgba(78, 205, 196, 0.2); color: #4ecdc4; border-radius: 20px; font-size: 0.8em; letter-spacing: 1px; }
-        .close-info { position: absolute; top: 20px; right: 20px; background: none; border: none; color: #fff; font-size: 1.5em; cursor: pointer; opacity: 0.6; transition: opacity 0.3s ease; pointer-events: auto; }
-        .close-info:hover { opacity: 1; }
-
-        .nav-dots { position: absolute; left: 60px; top: 50%; transform: translateY(-50%); display: flex; flex-direction: column; gap: 15px; pointer-events: auto; }
-        .nav-dot { width: 12px; height: 12px; border-radius: 50%; background: rgba(255,255,255,0.3); cursor: pointer; transition: all 0.3s ease; position: relative; }
-        .nav-dot:hover { background: rgba(255,255,255,0.6); transform: scale(1.3); }
-        .nav-dot.active { background: #4ecdc4; box-shadow: 0 0 20px #4ecdc4; }
-        .nav-dot::after { content: attr(data-title); position: absolute; left: 25px; top: 50%; transform: translateY(-50%); white-space: nowrap; background: rgba(0,0,0,0.9); padding: 5px 15px; border-radius: 5px; font-size: 0.8em; opacity: 0; pointer-events: none; transition: opacity 0.3s ease; }
-        .nav-dot:hover::after { opacity: 1; }
-
-        #entrance-guide { position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); text-align: center; z-index: 200; opacity: 1; transition: opacity 1s ease; pointer-events: none; }
-        #entrance-guide.hidden { opacity: 0; }
-        #entrance-guide h2 { font-family: 'Playfair Display', serif; font-size: 3em; margin-bottom: 20px; animation: fadeInUp 1s ease; }
-        #entrance-guide p { font-size: 1.2em; opacity: 0.8; animation: fadeInUp 1s ease 0.3s both; }
-        #entrance-guide .start-button { margin-top: 40px; padding: 15px 40px; background: linear-gradient(135deg, #ff6b6b, #4ecdc4); border: none; border-radius: 30px; color: white; font-size: 1.1em; font-weight: 700; cursor: pointer; pointer-events: auto; animation: fadeInUp 1s ease 0.6s both; transition: transform 0.3s ease, box-shadow 0.3s ease; }
-        #entrance-guide .start-button:hover { transform: translateY(-5px); box-shadow: 0 10px 30px rgba(78, 205, 196, 0.4); }
-
-        @keyframes fadeInUp { from { opacity: 0; transform: translateY(30px); } to { opacity: 1; transform: translateY(0); } }
-
-        .cursor-glow {
-            position: fixed; width: 300px; height: 300px;
-            background: radial-gradient(circle, rgba(78, 205, 196, 0.25) 0%, transparent 70%);
-            pointer-events: none; z-index: 9999; transform: translate(-50%, -50%);
-            transition: opacity 0.3s ease;
-        }
-    </style>
-</head>
-<body>
-    <div id="loading">
-        <h1>3-10 학습 나눔 게시판</h1>
-        <div class="loading-bar"><div class="loading-progress"></div></div>
-        <div class="loading-text">게시판을 준비하고 있습니다...</div>
-    </div>
-
-    <div id="entrance-guide">
-        <h2>3-10 학습 나눔</h2>
-        <p>메타버스 기반 학급 학습 공유 플랫폼 스터디갤러리</p>
-        <button class="start-button" onclick="startExhibition()">게시판 입장하기</button>
-    </div>
-
-    <div id="canvas-container"></div>
-    <div class="cursor-glow"></div>
-
-    <div id="ui-overlay">
-        <header>
-            <div class="logo">3-10 Metaverse Classroom Learning Hub — Study Gallery</div>
-            <div class="exhibition-info">
-                <div class="date">2026</div>
-                <div class="location">학급 내 자기주도학습 문화 확산 활동</div>
-            </div>
-        </header>
-
-        <div id="artwork-info">
-            <button class="close-info" onclick="closeArtworkInfo()">×</button>
-            <h2 id="artwork-title">작품 제목</h2>
-            <span class="date" id="artwork-date">2025.05.15</span>
-            <p class="description" id="artwork-description">작품 설명이 여기에 표시됩니다.</p>
-            <span class="category" id="artwork-category">카테고리</span>
-        </div>
-
-        <div class="nav-dots" id="nav-dots-container"></div>
-
-        <div class="controls">
-            <div class="control-item"><span class="control-key">W A S D</span><span>이동</span></div>
-            <div class="control-item"><span class="control-key">Q / E</span><span>이전/다음</span></div>
+            <div class="control-item"><span class="control-key">F</span><span>작품 선택</span></div>
             <div class="control-item"><span class="control-key">마우스</span><span>둘러보기</span></div>
             <div class="control-item"><span class="control-key">ESC</span><span>커서 해제</span></div>
         </div>
@@ -317,7 +441,9 @@
         let moveForward = false, moveBackward = false, moveLeft = false, moveRight = false;
         let isPointerLocked = false;
         let currentArtworkIndex = 0;
-        const cameraSpeed = 0.1, lookSpeed = 0.002;
+
+        const cameraSpeed = 0.1;
+        const lookSpeed = 0.002;
 
         function init() {
             scene = new THREE.Scene();
@@ -325,7 +451,7 @@
             scene.background = new THREE.Color(0x0a0a0a);
 
             camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
-            camera.position.set(0, 1.6, 0); // 시작 위치를 중심 근처로 설정
+            camera.position.set(0, 1.6, 0);
             camera.rotation.order = 'YXZ';
 
             renderer = new THREE.WebGLRenderer({ antialias: true });
@@ -343,53 +469,69 @@
 
             setTimeout(() => {
                 document.getElementById('loading').classList.add('hidden');
-                document.querySelector('.loading-progress').style.width = '100%';
-            }, 2000);
+            }, 1200);
         }
 
         function createLights() {
-            scene.add(new THREE.AmbientLight(0xffffff, 0.6)); 
-            
+            scene.add(new THREE.AmbientLight(0xffffff, 0.6));
+
             artworks.forEach((_, index) => {
                 const angle = (index / artworks.length) * Math.PI * 2;
                 const radius = 9;
+
                 const spotLight = new THREE.SpotLight(0xffffff, 0.6);
-                // 조명 위치를 액자 앞쪽(안쪽)으로 조정
                 spotLight.position.set(Math.cos(angle) * radius * 0.8, 4, Math.sin(angle) * radius * 0.8);
-                spotLight.target.position.set(Math.cos(angle) * radius, 1.8, Math.sin(angle) * radius);
+                spotLight.target.position.set(Math.cos(angle) * 12.8, 1.8, Math.sin(angle) * 12.8);
                 spotLight.angle = Math.PI / 6;
                 spotLight.penumbra = 0.3;
+
                 scene.add(spotLight);
                 scene.add(spotLight.target);
             });
         }
 
         function createGallerySpace() {
-            const floor = new THREE.Mesh(new THREE.CircleGeometry(15, 64), new THREE.MeshStandardMaterial({ color: 0x1a1a1a, roughness: 0.8 }));
-            floor.rotation.x = -Math.PI / 2; floor.receiveShadow = true;
+            const floor = new THREE.Mesh(
+                new THREE.CircleGeometry(15, 64),
+                new THREE.MeshStandardMaterial({ color: 0x1a1a1a, roughness: 0.8 })
+            );
+            floor.rotation.x = -Math.PI / 2;
+            floor.receiveShadow = true;
             scene.add(floor);
-            
-            // 벽면도 안쪽을 바라보도록 설정
-            const walls = new THREE.Mesh(new THREE.CylinderGeometry(13, 13, 7, 64, 1, true), new THREE.MeshStandardMaterial({ color: 0x111111, side: THREE.BackSide }));
-            walls.position.y = 3; scene.add(walls);
+
+            const walls = new THREE.Mesh(
+                new THREE.CylinderGeometry(13, 13, 7, 64, 1, true),
+                new THREE.MeshStandardMaterial({ color: 0x111111, side: THREE.BackSide })
+            );
+            walls.position.y = 3;
+            scene.add(walls);
         }
 
         function createArtworks() {
+            const loader = new THREE.TextureLoader();
+
             artworks.forEach((artwork, index) => {
                 const angle = (index / artworks.length) * Math.PI * 2;
-                const radius = 12.8; // 벽면에 가깝게 배치
+                const radius = 12.8;
                 const group = new THREE.Group();
 
-                const frame = new THREE.Mesh(new THREE.BoxGeometry(3.2, 2.6, 0.1), new THREE.MeshStandardMaterial({ color: 0xd4af37, roughness: 0.3, metalness: 0.8 }));
-                const texture = new THREE.TextureLoader().load(artwork.image);
-                const image = new THREE.Mesh(new THREE.PlaneGeometry(3, 2.4), new THREE.MeshStandardMaterial({ map: texture }));
+                const frame = new THREE.Mesh(
+                    new THREE.BoxGeometry(3.2, 2.6, 0.1),
+                    new THREE.MeshStandardMaterial({ color: 0xd4af37, roughness: 0.3, metalness: 0.8 })
+                );
+
+                const texture = loader.load(artwork.image);
+                const image = new THREE.Mesh(
+                    new THREE.PlaneGeometry(3, 2.4),
+                    new THREE.MeshStandardMaterial({ map: texture })
+                );
                 image.position.z = 0.06;
 
-                group.add(frame); group.add(image);
+                group.add(frame);
+                group.add(image);
+
                 group.position.set(Math.cos(angle) * radius, 1.8, Math.sin(angle) * radius);
-                
-                group.lookAt(0, 1.8, 0); 
-                
+                group.lookAt(0, 1.8, 0);
                 group.userData = { index, artwork };
 
                 createArtworkLabel(artwork, group);
@@ -402,23 +544,36 @@
         function createArtworkLabel(artwork, group) {
             const canvas = document.createElement('canvas');
             const ctx = canvas.getContext('2d');
-            canvas.width = 512; canvas.height = 128;
-            ctx.fillStyle = 'rgba(0, 0, 0, 0.8)'; ctx.fillRect(0, 0, 512, 128);
-            ctx.fillStyle = '#4ecdc4'; ctx.font = 'bold 32px "Noto Sans KR"'; ctx.textAlign = 'center';
+            canvas.width = 512;
+            canvas.height = 128;
+
+            ctx.fillStyle = 'rgba(0, 0, 0, 0.8)';
+            ctx.fillRect(0, 0, 512, 128);
+
+            ctx.fillStyle = '#4ecdc4';
+            ctx.font = 'bold 32px "Noto Sans KR"';
+            ctx.textAlign = 'center';
             ctx.fillText(artwork.title, 256, 50);
-            ctx.fillStyle = '#ffffff'; ctx.font = '24px "Noto Sans KR"';
+
+            ctx.fillStyle = '#ffffff';
+            ctx.font = '24px "Noto Sans KR"';
             ctx.fillText(artwork.date, 256, 90);
 
             const label = new THREE.Mesh(
                 new THREE.PlaneGeometry(1.5, 0.4),
-                new THREE.MeshBasicMaterial({ map: new THREE.CanvasTexture(canvas), transparent: true })
+                new THREE.MeshBasicMaterial({
+                    map: new THREE.CanvasTexture(canvas),
+                    transparent: true
+                })
             );
-            label.position.set(0, -1.6, 0.1); 
+
+            label.position.set(0, -1.6, 0.1);
             group.add(label);
         }
 
         function createNavDots() {
             const container = document.getElementById('nav-dots-container');
+
             artworks.forEach((artwork, i) => {
                 const dot = document.createElement('div');
                 dot.className = 'nav-dot';
@@ -430,367 +585,61 @@
 
         function setupEventListeners() {
             document.addEventListener('keydown', (e) => {
-                if(e.code === 'KeyW') moveForward = true; if(e.code === 'KeyS') moveBackward = true;
-                if(e.code === 'KeyA') moveLeft = true; if(e.code === 'KeyD') moveRight = true;
-                if(isExhibitionStarted) {
-                    if(e.code === 'KeyE') {
+                if (e.code === 'KeyW') moveForward = true;
+                if (e.code === 'KeyS') moveBackward = true;
+                if (e.code === 'KeyA') moveLeft = true;
+                if (e.code === 'KeyD') moveRight = true;
+
+                if (isExhibitionStarted) {
+                    if (e.code === 'KeyE') {
                         currentArtworkIndex = (currentArtworkIndex + 1) % artworks.length;
                         navigateToArtwork(currentArtworkIndex);
                     }
-                    if(e.code === 'KeyQ') {
+
+                    if (e.code === 'KeyQ') {
                         currentArtworkIndex = (currentArtworkIndex - 1 + artworks.length) % artworks.length;
                         navigateToArtwork(currentArtworkIndex);
                     }
-                }
-            });
-            document.addEventListener('keyup', (e) => {
-                if(e.code === 'KeyW') moveForward = false; if(e.code === 'KeyS') moveBackward = false;
-                if(e.code === 'KeyA') moveLeft = false; if(e.code === 'KeyD') moveRight = false;
-            });
 
-            document.addEventListener('mousemove', (e) => {
-                const glow = document.querySelector('.cursor-glow');
-                if (isPointerLocked) {
-                    camera.rotation.y -= e.movementX * lookSpeed;
-                    camera.rotation.x = Math.max(-Math.PI/3, Math.min(Math.PI/3, camera.rotation.x - e.movementY * lookSpeed));
-                    glow.style.left = '50%'; glow.style.top = '50%';
-                } else {
-                    glow.style.left = e.clientX + 'px'; glow.style.top = e.clientY + 'px';
-                }
-            });
-
-            renderer.domElement.addEventListener('click', (e) => {
-                if (!isExhibitionStarted) return;
-            
-                if (!isPointerLocked) {
-                    renderer.domElement.requestPointerLock();
-                    return;
-                }
-            
-                const rect = renderer.domElement.getBoundingClientRect();
-            
-                const mouse = new THREE.Vector2(
-                    ((e.clientX - rect.left) / rect.width) * 2 - 1,
-                    -((e.clientY - rect.top) / rect.height) * 2 + 1
-                );
-            
-                const ray = new THREE.Raycaster();
-                ray.setFromCamera(mouse, camera);
-            
-                const hits = ray.intersectObjects(artworkFrames, true);
-            
-                if (hits.length > 0) {
-                    let obj = hits[0].object;
-            
-                    while (obj.parent && !obj.userData.artwork) {
-                        obj = obj.parent;
-                    }
-            
-                    if (obj.userData.artwork) {
-                        currentArtworkIndex = obj.userData.index;
-                        showArtworkInfo(obj.userData.artwork, currentArtworkIndex);
-                    }
-                }
-            });
-
-            function selectArtworkAtCenter() {
-                const ray = new THREE.Raycaster();
-                ray.setFromCamera(new THREE.Vector2(0, 0), camera);
-            
-                const hits = ray.intersectObjects(artworkFrames, true);
-            
-                if (hits.length > 0) {
-                    let obj = hits[0].object;
-            
-                    while (obj.parent && !obj.userData.artwork) {
-                        obj = obj.parent;
-                    }
-            
-                    if (obj.userData.artwork) {
-                        currentArtworkIndex = obj.userData.index;
-                        showArtworkInfo(obj.userData.artwork, currentArtworkIndex);
-                    }
-                }
-            }
-
-            document.addEventListener('keydown', (e) => {
-                if(e.code === 'KeyW') moveForward = true;
-                if(e.code === 'KeyS') moveBackward = true;
-                if(e.code === 'KeyA') moveLeft = true;
-                if(e.code === 'KeyD') moveRight = true;
-            
-                if(isExhibitionStarted) {
-                    if(e.code === 'KeyE') {
-                        currentArtworkIndex = (currentArtworkIndex + 1) % artworks.length;
-                        navigateToArtwork(currentArtworkIndex);
-                    }
-                    if(e.code === 'KeyQ') {
-                        currentArtworkIndex = (currentArtworkIndex - 1 + artworks.length) % artworks.length;
-                        navigateToArtwork(currentArtworkIndex);
-                    }
-                    if(e.code === 'KeyF') {
+                    if (e.code === 'KeyF') {
                         selectArtworkAtCenter();
                     }
                 }
-            });    
-
-            
-            document.addEventListener('pointerlockchange', () => {
-                isPointerLocked = document.pointerLockElement === renderer.domElement;
             });
 
-            window.addEventListener('resize', () => {
-                camera.aspect = window.innerWidth / window.innerHeight; camera.updateProjectionMatrix();
-                renderer.setSize(window.innerWidth, window.innerHeight);
-            });
-        }
-
-        function updateCamera() {
-            if (!isExhibitionStarted) return;
-            const dir = new THREE.Vector3(); 
-            camera.getWorldDirection(dir);
-            dir.y = 0; 
-            dir.normalize();
-            
-            const side = new THREE.Vector3().crossVectors(camera.up, dir).normalize();
-            
-            if (moveForward) camera.position.add(dir.multiplyScalar(cameraSpeed));
-            if (moveBackward) camera.position.add(dir.multiplyScalar(-cameraSpeed));
-            if (moveLeft) camera.position.add(side.multiplyScalar(cameraSpeed));
-            if (moveRight) camera.position.add(side.multiplyScalar(-cameraSpeed));
-
-            const currentHeight = 1.6; 
-            const d = Math.sqrt(camera.position.x**2 + camera.position.z**2);
-            
-            if (d > 11) {
-                const ratio = 11 / d;
-                camera.position.x *= ratio;
-                camera.position.z *= ratio;
-            }
-            
-            camera.position.y = currentHeight; 
-
-            updateNavigationDots();
-        }
-
-        function navigateToArtwork(index) {
-            currentArtworkIndex = index;
-            const targetFrame = artworkFrames[index];
-            const angle = (index / artworks.length) * Math.PI * 2;
-            
-            const viewDistance = 8.5;
-            const newPos = new THREE.Vector3(Math.cos(angle) * viewDistance, 1.6, Math.sin(angle) * viewDistance);
-            
-            camera.position.copy(newPos);
-            camera.lookAt(targetFrame.position.x, 1.8, targetFrame.position.z);
-            
-            showArtworkInfo(artworks[index], index);
-        }
-
-        function showArtworkInfo(artwork, index) {
-            document.getElementById('artwork-title').textContent = artwork.title;
-            document.getElementById('artwork-date').textContent = artwork.date;
-            document.getElementById('artwork-description').textContent = artwork.description;
-            document.getElementById('artwork-category').textContent = artwork.category;
-            document.getElementById('artwork-info').classList.add('visible');
-        }
-
-        function closeArtworkInfo() { document.getElementById('artwork-info').classList.remove('visible'); }
-
-        function updateNavigationDots() {
-            const dots = document.querySelectorAll('.nav-dot');
-            let near = 0, min = Infinity;
-            artworkFrames.forEach((f, i) => {
-                const d = camera.position.distanceTo(f.position);
-                if(d < min) { min = d; near = i; }
-            });
-            dots.forEach((dot, i) => dot.classList.toggle('active', i === near));
-        }
-
-        function startExhibition() {
-            isExhibitionStarted = true;
-            document.getElementById('entrance-guide').classList.add('hidden');
-            renderer.domElement.requestPointerLock();
-            navigateToArtwork(0);
-        }
-
-        function animate() {
-            requestAnimationFrame(animate);
-            updateCamera();
-            renderer.render(scene, camera);
-        }
-
-        window.addEventListener('load', init);
-    </script>
-</body>
-</html>
-
-        let scene, camera, renderer;
-        let artworkFrames = [];
-        let isExhibitionStarted = false;
-        let moveForward = false, moveBackward = false, moveLeft = false, moveRight = false;
-        let isPointerLocked = false;
-        let currentArtworkIndex = 0;
-        const cameraSpeed = 0.1, lookSpeed = 0.002;
-
-        function init() {
-            scene = new THREE.Scene();
-            scene.fog = new THREE.Fog(0x0a0a0a, 1, 50);
-            scene.background = new THREE.Color(0x0a0a0a);
-
-            camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
-            camera.position.set(0, 1.6, 0); // 시작 위치를 중심 근처로 설정
-            camera.rotation.order = 'YXZ';
-
-            renderer = new THREE.WebGLRenderer({ antialias: true });
-            renderer.setSize(window.innerWidth, window.innerHeight);
-            renderer.shadowMap.enabled = true;
-            renderer.shadowMap.type = THREE.PCFSoftShadowMap;
-            document.getElementById('canvas-container').appendChild(renderer.domElement);
-
-            createLights();
-            createGallerySpace();
-            createArtworks();
-            createNavDots();
-            setupEventListeners();
-            animate();
-
-            setTimeout(() => {
-                document.getElementById('loading').classList.add('hidden');
-                document.querySelector('.loading-progress').style.width = '100%';
-            }, 2000);
-        }
-
-        function createLights() {
-            scene.add(new THREE.AmbientLight(0xffffff, 0.6)); 
-            
-            artworks.forEach((_, index) => {
-                const angle = (index / artworks.length) * Math.PI * 2;
-                const radius = 9;
-                const spotLight = new THREE.SpotLight(0xffffff, 0.6);
-                // 조명 위치를 액자 앞쪽(안쪽)으로 조정
-                spotLight.position.set(Math.cos(angle) * radius * 0.8, 4, Math.sin(angle) * radius * 0.8);
-                spotLight.target.position.set(Math.cos(angle) * radius, 1.8, Math.sin(angle) * radius);
-                spotLight.angle = Math.PI / 6;
-                spotLight.penumbra = 0.3;
-                scene.add(spotLight);
-                scene.add(spotLight.target);
-            });
-        }
-
-        function createGallerySpace() {
-            const floor = new THREE.Mesh(new THREE.CircleGeometry(15, 64), new THREE.MeshStandardMaterial({ color: 0x1a1a1a, roughness: 0.8 }));
-            floor.rotation.x = -Math.PI / 2; floor.receiveShadow = true;
-            scene.add(floor);
-            
-            // 벽면도 안쪽을 바라보도록 설정
-            const walls = new THREE.Mesh(new THREE.CylinderGeometry(13, 13, 7, 64, 1, true), new THREE.MeshStandardMaterial({ color: 0x111111, side: THREE.BackSide }));
-            walls.position.y = 3; scene.add(walls);
-        }
-
-        function createArtworks() {
-            artworks.forEach((artwork, index) => {
-                const angle = (index / artworks.length) * Math.PI * 2;
-                const radius = 12.8; // 벽면에 가깝게 배치
-                const group = new THREE.Group();
-
-                const frame = new THREE.Mesh(new THREE.BoxGeometry(3.2, 2.6, 0.1), new THREE.MeshStandardMaterial({ color: 0xd4af37, roughness: 0.3, metalness: 0.8 }));
-                const texture = new THREE.TextureLoader().load(artwork.image);
-                const image = new THREE.Mesh(new THREE.PlaneGeometry(3, 2.4), new THREE.MeshStandardMaterial({ map: texture }));
-                image.position.z = 0.06;
-
-                group.add(frame); group.add(image);
-                group.position.set(Math.cos(angle) * radius, 1.8, Math.sin(angle) * radius);
-                
-                group.lookAt(0, 1.8, 0); 
-                
-                group.userData = { index, artwork };
-
-                createArtworkLabel(artwork, group);
-
-                artworkFrames.push(group);
-                scene.add(group);
-            });
-        }
-
-        function createArtworkLabel(artwork, group) {
-            const canvas = document.createElement('canvas');
-            const ctx = canvas.getContext('2d');
-            canvas.width = 512; canvas.height = 128;
-            ctx.fillStyle = 'rgba(0, 0, 0, 0.8)'; ctx.fillRect(0, 0, 512, 128);
-            ctx.fillStyle = '#4ecdc4'; ctx.font = 'bold 32px "Noto Sans KR"'; ctx.textAlign = 'center';
-            ctx.fillText(artwork.title, 256, 50);
-            ctx.fillStyle = '#ffffff'; ctx.font = '24px "Noto Sans KR"';
-            ctx.fillText(artwork.date, 256, 90);
-
-            const label = new THREE.Mesh(
-                new THREE.PlaneGeometry(1.5, 0.4),
-                new THREE.MeshBasicMaterial({ map: new THREE.CanvasTexture(canvas), transparent: true })
-            );
-            label.position.set(0, -1.6, 0.1); 
-            group.add(label);
-        }
-
-        function createNavDots() {
-            const container = document.getElementById('nav-dots-container');
-            artworks.forEach((artwork, i) => {
-                const dot = document.createElement('div');
-                dot.className = 'nav-dot';
-                dot.setAttribute('data-title', artwork.title);
-                dot.onclick = () => navigateToArtwork(i);
-                container.appendChild(dot);
-            });
-        }
-
-        function setupEventListeners() {
-            document.addEventListener('keydown', (e) => {
-                if(e.code === 'KeyW') moveForward = true; if(e.code === 'KeyS') moveBackward = true;
-                if(e.code === 'KeyA') moveLeft = true; if(e.code === 'KeyD') moveRight = true;
-                if(isExhibitionStarted) {
-                    if(e.code === 'KeyE') {
-                        currentArtworkIndex = (currentArtworkIndex + 1) % artworks.length;
-                        navigateToArtwork(currentArtworkIndex);
-                    }
-                    if(e.code === 'KeyQ') {
-                        currentArtworkIndex = (currentArtworkIndex - 1 + artworks.length) % artworks.length;
-                        navigateToArtwork(currentArtworkIndex);
-                    }
-                }
-            });
             document.addEventListener('keyup', (e) => {
-                if(e.code === 'KeyW') moveForward = false; if(e.code === 'KeyS') moveBackward = false;
-                if(e.code === 'KeyA') moveLeft = false; if(e.code === 'KeyD') moveRight = false;
+                if (e.code === 'KeyW') moveForward = false;
+                if (e.code === 'KeyS') moveBackward = false;
+                if (e.code === 'KeyA') moveLeft = false;
+                if (e.code === 'KeyD') moveRight = false;
             });
 
             document.addEventListener('mousemove', (e) => {
                 const glow = document.querySelector('.cursor-glow');
+
                 if (isPointerLocked) {
                     camera.rotation.y -= e.movementX * lookSpeed;
-                    camera.rotation.x = Math.max(-Math.PI/3, Math.min(Math.PI/3, camera.rotation.x - e.movementY * lookSpeed));
-                    glow.style.left = '50%'; glow.style.top = '50%';
+                    camera.rotation.x = Math.max(
+                        -Math.PI / 3,
+                        Math.min(Math.PI / 3, camera.rotation.x - e.movementY * lookSpeed)
+                    );
+                    glow.style.left = '50%';
+                    glow.style.top = '50%';
                 } else {
-                    glow.style.left = e.clientX + 'px'; glow.style.top = e.clientY + 'px';
+                    glow.style.left = e.clientX + 'px';
+                    glow.style.top = e.clientY + 'px';
                 }
             });
 
             renderer.domElement.addEventListener('click', () => {
-                if (isExhibitionStarted) {
-                    if (!isPointerLocked) {
-                        renderer.domElement.requestPointerLock();
-                    } else {
-                        const ray = new THREE.Raycaster();
-                        ray.setFromCamera(new THREE.Vector2(0,0), camera);
-                        const hits = ray.intersectObjects(artworkFrames, true);
-                        if (hits.length > 0) {
-                            let obj = hits[0].object;
-                            while(obj.parent && !obj.userData.artwork) { obj = obj.parent; }
-                            if(obj.userData.artwork) {
-                                currentArtworkIndex = obj.userData.index;
-                                showArtworkInfo(obj.userData.artwork, currentArtworkIndex);
-                            }
-                        }
-                    }
+                if (!isExhibitionStarted) return;
+
+                if (!isPointerLocked) {
+                    renderer.domElement.requestPointerLock();
+                    return;
                 }
+
+                selectArtworkAtCenter();
             });
 
             document.addEventListener('pointerlockchange', () => {
@@ -798,35 +647,58 @@
             });
 
             window.addEventListener('resize', () => {
-                camera.aspect = window.innerWidth / window.innerHeight; camera.updateProjectionMatrix();
+                camera.aspect = window.innerWidth / window.innerHeight;
+                camera.updateProjectionMatrix();
                 renderer.setSize(window.innerWidth, window.innerHeight);
             });
         }
 
+        function selectArtworkAtCenter() {
+            const ray = new THREE.Raycaster();
+            ray.setFromCamera(new THREE.Vector2(0, 0), camera);
+
+            const hits = ray.intersectObjects(artworkFrames, true);
+
+            if (hits.length > 0) {
+                let obj = hits[0].object;
+
+                while (obj.parent && !obj.userData.artwork) {
+                    obj = obj.parent;
+                }
+
+                if (obj.userData.artwork) {
+                    currentArtworkIndex = obj.userData.index;
+                    navigateToArtwork(currentArtworkIndex);
+                    showArtworkInfo(obj.userData.artwork);
+                }
+            }
+        }
+
         function updateCamera() {
             if (!isExhibitionStarted) return;
-            const dir = new THREE.Vector3(); 
-            camera.getWorldDirection(dir);
-            dir.y = 0; 
-            dir.normalize();
-            
-            const side = new THREE.Vector3().crossVectors(camera.up, dir).normalize();
-            
-            if (moveForward) camera.position.add(dir.multiplyScalar(cameraSpeed));
-            if (moveBackward) camera.position.add(dir.multiplyScalar(-cameraSpeed));
-            if (moveLeft) camera.position.add(side.multiplyScalar(cameraSpeed));
-            if (moveRight) camera.position.add(side.multiplyScalar(-cameraSpeed));
 
-            const currentHeight = 1.6; 
-            const d = Math.sqrt(camera.position.x**2 + camera.position.z**2);
-            
+            const dir = new THREE.Vector3();
+            camera.getWorldDirection(dir);
+            dir.y = 0;
+            dir.normalize();
+
+            const side = new THREE.Vector3().crossVectors(camera.up, dir).normalize();
+
+            if (moveForward) camera.position.add(dir.clone().multiplyScalar(cameraSpeed));
+            if (moveBackward) camera.position.add(dir.clone().multiplyScalar(-cameraSpeed));
+            if (moveLeft) camera.position.add(side.clone().multiplyScalar(cameraSpeed));
+            if (moveRight) camera.position.add(side.clone().multiplyScalar(-cameraSpeed));
+
+            const currentHeight = 1.6;
+            const d = Math.sqrt(camera.position.x ** 2 + camera.position.z ** 2);
+
             if (d > 11) {
                 const ratio = 11 / d;
                 camera.position.x *= ratio;
                 camera.position.z *= ratio;
             }
-            
-            camera.position.y = currentHeight; 
+
+            camera.position.y = currentHeight;
 
             updateNavigationDots();
         }
@@ -835,17 +707,21 @@
             currentArtworkIndex = index;
             const targetFrame = artworkFrames[index];
             const angle = (index / artworks.length) * Math.PI * 2;
-            
+
             const viewDistance = 8.5;
-            const newPos = new THREE.Vector3(Math.cos(angle) * viewDistance, 1.6, Math.sin(angle) * viewDistance);
-            
+            const newPos = new THREE.Vector3(
+                Math.cos(angle) * viewDistance,
+                1.6,
+                Math.sin(angle) * viewDistance
+            );
+
             camera.position.copy(newPos);
             camera.lookAt(targetFrame.position.x, 1.8, targetFrame.position.z);
-            
-            showArtworkInfo(artworks[index], index);
+
+            showArtworkInfo(artworks[index]);
         }
 
-        function showArtworkInfo(artwork, index) {
+        function showArtworkInfo(artwork) {
             document.getElementById('artwork-title').textContent = artwork.title;
             document.getElementById('artwork-date').textContent = artwork.date;
             document.getElementById('artwork-description').textContent = artwork.description;
@@ -853,16 +729,26 @@
             document.getElementById('artwork-info').classList.add('visible');
         }
 
-        function closeArtworkInfo() { document.getElementById('artwork-info').classList.remove('visible'); }
+        function closeArtworkInfo() {
+            document.getElementById('artwork-info').classList.remove('visible');
+        }
 
         function updateNavigationDots() {
             const dots = document.querySelectorAll('.nav-dot');
-            let near = 0, min = Infinity;
+            let near = 0;
+            let min = Infinity;
+
             artworkFrames.forEach((f, i) => {
                 const d = camera.position.distanceTo(f.position);
-                if(d < min) { min = d; near = i; }
+                if (d < min) {
+                    min = d;
+                    near = i;
+                }
             });
-            dots.forEach((dot, i) => dot.classList.toggle('active', i === near));
+
+            dots.forEach((dot, i) => {
+                dot.classList.toggle('active', i === near);
+            });
         }
 
         function startExhibition() {
