@@ -94,6 +94,8 @@
     </style>
 </head>
 <body>
+    <div id="crosshair"></div>
+
     <div id="loading">
         <h1>3-10 학습 나눔 게시판</h1>
         <div class="loading-bar"><div class="loading-progress"></div></div>
@@ -156,7 +158,20 @@
             overflow: hidden;
             cursor: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" fill="white" opacity="0.3"/><circle cx="12" cy="12" r="3" fill="white"/></svg>'), auto;
         }
-
+  
+        #crosshair {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            width: 14px;
+            height: 14px;
+            transform: translate(-50%, -50%);
+            border: 2px solid rgba(255,255,255,0.9);
+            border-radius: 50%;
+            z-index: 1000;
+            pointer-events: none;
+        }
+ 
         #canvas-container { position: fixed; top: 0; left: 0; width: 100%; height: 100%; }
 
         #loading {
@@ -444,26 +459,82 @@
                 }
             });
 
-            renderer.domElement.addEventListener('click', () => {
-                if (isExhibitionStarted) {
-                    if (!isPointerLocked) {
-                        renderer.domElement.requestPointerLock();
-                    } else {
-                        const ray = new THREE.Raycaster();
-                        ray.setFromCamera(new THREE.Vector2(0,0), camera);
-                        const hits = ray.intersectObjects(artworkFrames, true);
-                        if (hits.length > 0) {
-                            let obj = hits[0].object;
-                            while(obj.parent && !obj.userData.artwork) { obj = obj.parent; }
-                            if(obj.userData.artwork) {
-                                currentArtworkIndex = obj.userData.index;
-                                showArtworkInfo(obj.userData.artwork, currentArtworkIndex);
-                            }
-                        }
+            renderer.domElement.addEventListener('click', (e) => {
+                if (!isExhibitionStarted) return;
+            
+                if (!isPointerLocked) {
+                    renderer.domElement.requestPointerLock();
+                    return;
+                }
+            
+                const rect = renderer.domElement.getBoundingClientRect();
+            
+                const mouse = new THREE.Vector2(
+                    ((e.clientX - rect.left) / rect.width) * 2 - 1,
+                    -((e.clientY - rect.top) / rect.height) * 2 + 1
+                );
+            
+                const ray = new THREE.Raycaster();
+                ray.setFromCamera(mouse, camera);
+            
+                const hits = ray.intersectObjects(artworkFrames, true);
+            
+                if (hits.length > 0) {
+                    let obj = hits[0].object;
+            
+                    while (obj.parent && !obj.userData.artwork) {
+                        obj = obj.parent;
+                    }
+            
+                    if (obj.userData.artwork) {
+                        currentArtworkIndex = obj.userData.index;
+                        showArtworkInfo(obj.userData.artwork, currentArtworkIndex);
                     }
                 }
             });
 
+            function selectArtworkAtCenter() {
+                const ray = new THREE.Raycaster();
+                ray.setFromCamera(new THREE.Vector2(0, 0), camera);
+            
+                const hits = ray.intersectObjects(artworkFrames, true);
+            
+                if (hits.length > 0) {
+                    let obj = hits[0].object;
+            
+                    while (obj.parent && !obj.userData.artwork) {
+                        obj = obj.parent;
+                    }
+            
+                    if (obj.userData.artwork) {
+                        currentArtworkIndex = obj.userData.index;
+                        showArtworkInfo(obj.userData.artwork, currentArtworkIndex);
+                    }
+                }
+            }
+
+            document.addEventListener('keydown', (e) => {
+                if(e.code === 'KeyW') moveForward = true;
+                if(e.code === 'KeyS') moveBackward = true;
+                if(e.code === 'KeyA') moveLeft = true;
+                if(e.code === 'KeyD') moveRight = true;
+            
+                if(isExhibitionStarted) {
+                    if(e.code === 'KeyE') {
+                        currentArtworkIndex = (currentArtworkIndex + 1) % artworks.length;
+                        navigateToArtwork(currentArtworkIndex);
+                    }
+                    if(e.code === 'KeyQ') {
+                        currentArtworkIndex = (currentArtworkIndex - 1 + artworks.length) % artworks.length;
+                        navigateToArtwork(currentArtworkIndex);
+                    }
+                    if(e.code === 'KeyF') {
+                        selectArtworkAtCenter();
+                    }
+                }
+            });    
+
+            
             document.addEventListener('pointerlockchange', () => {
                 isPointerLocked = document.pointerLockElement === renderer.domElement;
             });
