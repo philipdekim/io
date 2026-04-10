@@ -5,9 +5,14 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>3-10 학습 나눔</title>
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=Noto+Sans+KR:wght@300;400;700&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=Noto+Sans+KR:wght@300;400;500;700&display=swap');
 
         * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        html, body {
+            width: 100%;
+            height: 100%;
+        }
 
         body {
             font-family: 'Noto Sans KR', sans-serif;
@@ -17,40 +22,60 @@
             cursor: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" fill="white" opacity="0.3"/><circle cx="12" cy="12" r="3" fill="white"/></svg>'), auto;
         }
 
+        #canvas-container {
+            position: fixed;
+            inset: 0;
+            width: 100%;
+            height: 100%;
+        }
+
         #crosshair {
             position: fixed;
             top: 50%;
             left: 50%;
-            width: 14px;
-            height: 14px;
+            width: 16px;
+            height: 16px;
             transform: translate(-50%, -50%);
-            border: 2px solid rgba(255,255,255,0.9);
+            border: 2px solid rgba(255,255,255,0.95);
             border-radius: 50%;
             z-index: 1000;
             pointer-events: none;
+            box-shadow: 0 0 12px rgba(255,255,255,0.35);
         }
 
-        #canvas-container {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
+        #crosshair::before,
+        #crosshair::after {
+            content: "";
+            position: absolute;
+            background: rgba(255,255,255,0.85);
+        }
+
+        #crosshair::before {
+            width: 22px;
+            height: 2px;
+            left: 50%;
+            top: 50%;
+            transform: translate(-50%, -50%);
+        }
+
+        #crosshair::after {
+            width: 2px;
+            height: 22px;
+            left: 50%;
+            top: 50%;
+            transform: translate(-50%, -50%);
         }
 
         #loading {
             position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
+            inset: 0;
             background: #000;
             display: flex;
             flex-direction: column;
             justify-content: center;
             align-items: center;
             z-index: 10000;
-            transition: opacity 1s ease;
+            transition: opacity 0.8s ease;
         }
 
         #loading.hidden {
@@ -60,7 +85,7 @@
 
         #loading h1 {
             font-family: 'Playfair Display', serif;
-            font-size: 4em;
+            font-size: 3.8em;
             font-weight: 900;
             background: linear-gradient(45deg, #ff6b6b, #4ecdc4, #ffe66d, #a8e6cf);
             background-size: 300% 300%;
@@ -68,8 +93,9 @@
             -webkit-text-fill-color: transparent;
             background-clip: text;
             animation: gradientShift 3s ease infinite;
-            margin-bottom: 30px;
+            margin-bottom: 26px;
             letter-spacing: -2px;
+            text-align: center;
         }
 
         @keyframes gradientShift {
@@ -78,12 +104,12 @@
         }
 
         .loading-bar {
-            width: 300px;
+            width: 320px;
             height: 4px;
-            background: rgba(255,255,255,0.1);
+            background: rgba(255,255,255,0.12);
             border-radius: 10px;
             overflow: hidden;
-            margin-top: 20px;
+            margin-top: 18px;
         }
 
         .loading-progress {
@@ -93,18 +119,81 @@
         }
 
         .loading-text {
-            margin-top: 20px;
-            color: rgba(255,255,255,0.6);
-            font-size: 0.9em;
+            margin-top: 16px;
+            color: rgba(255,255,255,0.66);
+            font-size: 0.92em;
             letter-spacing: 2px;
+        }
+
+        #entrance-guide {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            text-align: center;
+            z-index: 200;
+            opacity: 1;
+            transition: opacity 0.9s ease;
+            pointer-events: none;
+        }
+
+        #entrance-guide.hidden {
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        #entrance-guide h2 {
+            font-family: 'Playfair Display', serif;
+            font-size: 3em;
+            margin-bottom: 20px;
+            animation: fadeInUp 1s ease;
+        }
+
+        #entrance-guide p {
+            font-size: 1.15em;
+            opacity: 0.86;
+            animation: fadeInUp 1s ease 0.25s both;
+        }
+
+        #entrance-guide .start-button {
+            margin-top: 34px;
+            padding: 15px 42px;
+            background: linear-gradient(135deg, #ff6b6b, #4ecdc4);
+            border: none;
+            border-radius: 30px;
+            color: white;
+            font-size: 1.06em;
+            font-weight: 700;
+            cursor: pointer;
+            pointer-events: auto;
+            animation: fadeInUp 1s ease 0.5s both;
+            transition: transform 0.25s ease, box-shadow 0.25s ease;
+        }
+
+        #entrance-guide .start-button:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 10px 30px rgba(78, 205, 196, 0.35);
+        }
+
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(28px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .cursor-glow {
+            position: fixed;
+            width: 340px;
+            height: 340px;
+            background: radial-gradient(circle, rgba(78, 205, 196, 0.20) 0%, transparent 70%);
+            pointer-events: none;
+            z-index: 9999;
+            transform: translate(-50%, -50%);
+            transition: opacity 0.25s ease;
         }
 
         #ui-overlay {
             position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
+            inset: 0;
             pointer-events: none;
             z-index: 100;
         }
@@ -114,7 +203,7 @@
             top: 0;
             left: 0;
             right: 0;
-            padding: 40px 60px;
+            padding: 34px 48px;
             display: flex;
             justify-content: space-between;
             align-items: flex-start;
@@ -126,11 +215,12 @@
             font-size: 1.8em;
             font-weight: 900;
             letter-spacing: -1px;
+            text-shadow: 0 2px 10px rgba(0,0,0,0.35);
         }
 
         .exhibition-info {
             text-align: right;
-            opacity: 0.8;
+            opacity: 0.88;
         }
 
         .exhibition-info .date {
@@ -141,59 +231,64 @@
         }
 
         .exhibition-info .location {
-            font-size: 0.9em;
+            font-size: 0.92em;
             margin-top: 5px;
             font-weight: 300;
         }
 
         .controls {
             position: absolute;
-            bottom: 40px;
+            bottom: 26px;
             left: 50%;
             transform: translateX(-50%);
-            background: rgba(0,0,0,0.7);
-            backdrop-filter: blur(10px);
-            padding: 20px 40px;
-            border-radius: 50px;
-            border: 1px solid rgba(255,255,255,0.1);
+            background: rgba(0,0,0,0.72);
+            backdrop-filter: blur(12px);
+            padding: 18px 28px;
+            border-radius: 42px;
+            border: 1px solid rgba(255,255,255,0.12);
             pointer-events: auto;
             display: flex;
-            gap: 30px;
+            gap: 24px;
             align-items: center;
+            max-width: calc(100vw - 40px);
+            flex-wrap: wrap;
+            justify-content: center;
         }
 
         .control-item {
             display: flex;
             align-items: center;
-            gap: 10px;
-            font-size: 0.85em;
+            gap: 9px;
+            font-size: 0.84em;
+            color: rgba(255,255,255,0.94);
         }
 
         .control-key {
-            background: rgba(255,255,255,0.1);
-            padding: 5px 12px;
-            border-radius: 5px;
+            background: rgba(255,255,255,0.10);
+            padding: 6px 12px;
+            border-radius: 8px;
             font-weight: 700;
-            font-size: 0.9em;
-            border: 1px solid rgba(255,255,255,0.2);
-            min-width: 35px;
+            font-size: 0.92em;
+            border: 1px solid rgba(255,255,255,0.22);
+            min-width: 42px;
             text-align: center;
         }
 
         #artwork-info {
             position: absolute;
             top: 50%;
-            right: 60px;
+            right: 34px;
             transform: translateY(-50%);
-            width: 350px;
-            background: rgba(0,0,0,0.85);
-            backdrop-filter: blur(20px);
-            padding: 40px;
-            border-radius: 20px;
-            border: 1px solid rgba(255,255,255,0.1);
+            width: 340px;
+            background: rgba(0,0,0,0.84);
+            backdrop-filter: blur(16px);
+            padding: 34px;
+            border-radius: 22px;
+            border: 1px solid rgba(255,255,255,0.10);
             opacity: 0;
             pointer-events: none;
-            transition: opacity 0.4s ease, transform 0.4s ease;
+            transition: opacity 0.32s ease, transform 0.32s ease;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.35);
         }
 
         #artwork-info.visible {
@@ -211,40 +306,41 @@
 
         #artwork-info .date {
             color: #4ecdc4;
-            font-size: 0.85em;
+            font-size: 0.92em;
             letter-spacing: 2px;
-            margin-bottom: 20px;
+            margin-bottom: 18px;
             display: block;
         }
 
         #artwork-info .description {
             line-height: 1.8;
-            opacity: 0.9;
+            opacity: 0.92;
             font-weight: 300;
+            word-break: keep-all;
         }
 
         #artwork-info .category {
             display: inline-block;
-            margin-top: 20px;
+            margin-top: 18px;
             padding: 8px 16px;
-            background: rgba(78, 205, 196, 0.2);
+            background: rgba(78, 205, 196, 0.18);
             color: #4ecdc4;
             border-radius: 20px;
-            font-size: 0.8em;
+            font-size: 0.82em;
             letter-spacing: 1px;
         }
 
         .close-info {
             position: absolute;
-            top: 20px;
-            right: 20px;
+            top: 16px;
+            right: 18px;
             background: none;
             border: none;
             color: #fff;
-            font-size: 1.5em;
+            font-size: 1.55em;
             cursor: pointer;
-            opacity: 0.6;
-            transition: opacity 0.3s ease;
+            opacity: 0.66;
+            transition: opacity 0.2s ease;
             pointer-events: auto;
         }
 
@@ -254,12 +350,12 @@
 
         .nav-dots {
             position: absolute;
-            left: 60px;
+            left: 34px;
             top: 50%;
             transform: translateY(-50%);
             display: flex;
             flex-direction: column;
-            gap: 15px;
+            gap: 14px;
             pointer-events: auto;
         }
 
@@ -267,105 +363,176 @@
             width: 12px;
             height: 12px;
             border-radius: 50%;
-            background: rgba(255,255,255,0.3);
+            background: rgba(255,255,255,0.28);
             cursor: pointer;
-            transition: all 0.3s ease;
+            transition: all 0.25s ease;
             position: relative;
         }
 
         .nav-dot:hover {
-            background: rgba(255,255,255,0.6);
-            transform: scale(1.3);
+            background: rgba(255,255,255,0.62);
+            transform: scale(1.25);
         }
 
         .nav-dot.active {
             background: #4ecdc4;
-            box-shadow: 0 0 20px #4ecdc4;
+            box-shadow: 0 0 18px #4ecdc4;
         }
 
         .nav-dot::after {
             content: attr(data-title);
             position: absolute;
-            left: 25px;
+            left: 24px;
             top: 50%;
             transform: translateY(-50%);
             white-space: nowrap;
-            background: rgba(0,0,0,0.9);
-            padding: 5px 15px;
-            border-radius: 5px;
+            background: rgba(0,0,0,0.92);
+            padding: 5px 14px;
+            border-radius: 8px;
             font-size: 0.8em;
             opacity: 0;
             pointer-events: none;
-            transition: opacity 0.3s ease;
+            transition: opacity 0.2s ease;
         }
 
         .nav-dot:hover::after {
             opacity: 1;
         }
 
-        #entrance-guide {
+        #image-modal {
             position: fixed;
-            top: 50%;
+            inset: 0;
+            background: rgba(0,0,0,0.92);
+            z-index: 20000;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 24px;
+        }
+
+        #image-modal.hidden {
+            display: none;
+        }
+
+        .image-modal-inner {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow: auto;
+        }
+
+        #image-modal-img {
+            max-width: 96vw;
+            max-height: 92vh;
+            width: auto;
+            height: auto;
+            object-fit: contain;
+            background: #fff;
+            border-radius: 10px;
+            box-shadow: 0 24px 80px rgba(0,0,0,0.55);
+            image-rendering: auto;
+        }
+
+        .image-modal-toolbar {
+            position: fixed;
+            top: 20px;
             left: 50%;
-            transform: translate(-50%, -50%);
-            text-align: center;
-            z-index: 200;
-            opacity: 1;
-            transition: opacity 1s ease;
-            pointer-events: none;
+            transform: translateX(-50%);
+            display: flex;
+            gap: 10px;
+            align-items: center;
+            background: rgba(20,20,20,0.82);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255,255,255,0.12);
+            border-radius: 999px;
+            padding: 10px 14px;
+            z-index: 20010;
         }
 
-        #entrance-guide.hidden {
-            opacity: 0;
-        }
-
-        #entrance-guide h2 {
-            font-family: 'Playfair Display', serif;
-            font-size: 3em;
-            margin-bottom: 20px;
-            animation: fadeInUp 1s ease;
-        }
-
-        #entrance-guide p {
-            font-size: 1.2em;
-            opacity: 0.8;
-            animation: fadeInUp 1s ease 0.3s both;
-        }
-
-        #entrance-guide .start-button {
-            margin-top: 40px;
-            padding: 15px 40px;
-            background: linear-gradient(135deg, #ff6b6b, #4ecdc4);
+        .image-modal-btn {
             border: none;
-            border-radius: 30px;
-            color: white;
-            font-size: 1.1em;
-            font-weight: 700;
+            background: rgba(255,255,255,0.08);
+            color: #fff;
+            border-radius: 999px;
+            padding: 10px 14px;
             cursor: pointer;
-            pointer-events: auto;
-            animation: fadeInUp 1s ease 0.6s both;
-            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            font-size: 0.95em;
         }
 
-        #entrance-guide .start-button:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 10px 30px rgba(78, 205, 196, 0.4);
+        .image-modal-btn:hover {
+            background: rgba(255,255,255,0.16);
         }
 
-        @keyframes fadeInUp {
-            from { opacity: 0; transform: translateY(30px); }
-            to { opacity: 1; transform: translateY(0); }
+        .image-modal-title {
+            color: rgba(255,255,255,0.92);
+            font-size: 0.92em;
+            margin: 0 4px;
         }
 
-        .cursor-glow {
+        .hint-toast {
             position: fixed;
-            width: 300px;
-            height: 300px;
-            background: radial-gradient(circle, rgba(78, 205, 196, 0.25) 0%, transparent 70%);
-            pointer-events: none;
-            z-index: 9999;
-            transform: translate(-50%, -50%);
-            transition: opacity 0.3s ease;
+            top: 78px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(0,0,0,0.72);
+            color: rgba(255,255,255,0.86);
+            padding: 10px 16px;
+            border-radius: 999px;
+            z-index: 1200;
+            font-size: 0.88em;
+            backdrop-filter: blur(8px);
+            border: 1px solid rgba(255,255,255,0.10);
+        }
+
+        .hint-toast.hidden {
+            display: none;
+        }
+
+        @media (max-width: 900px) {
+            header {
+                padding: 20px 20px;
+            }
+
+            .logo {
+                font-size: 1.25em;
+                max-width: 58vw;
+                line-height: 1.25;
+            }
+
+            #artwork-info {
+                right: 16px;
+                left: 16px;
+                width: auto;
+                top: auto;
+                bottom: 110px;
+                transform: none;
+            }
+
+            #artwork-info.visible {
+                transform: none;
+            }
+
+            .nav-dots {
+                left: 16px;
+            }
+
+            .controls {
+                bottom: 14px;
+                gap: 12px;
+                padding: 14px 18px;
+            }
+
+            #entrance-guide h2 {
+                font-size: 2.2em;
+            }
+
+            #loading h1 {
+                font-size: 2.3em;
+                padding: 0 20px;
+            }
         }
     </style>
 </head>
@@ -399,7 +566,7 @@
         <div id="artwork-info">
             <button class="close-info" onclick="closeArtworkInfo()">×</button>
             <h2 id="artwork-title">작품 제목</h2>
-            <span class="date" id="artwork-date">2025.05.15</span>
+            <span class="date" id="artwork-date">학번</span>
             <p class="description" id="artwork-description">작품 설명이 여기에 표시됩니다.</p>
             <span class="category" id="artwork-category">카테고리</span>
         </div>
@@ -409,9 +576,24 @@
         <div class="controls">
             <div class="control-item"><span class="control-key">W A S D</span><span>이동</span></div>
             <div class="control-item"><span class="control-key">Q / E</span><span>이전/다음</span></div>
-            <div class="control-item"><span class="control-key">F</span><span>작품 선택</span></div>
-            <div class="control-item"><span class="control-key">마우스</span><span>둘러보기</span></div>
-            <div class="control-item"><span class="control-key">ESC</span><span>커서 해제</span></div>
+            <div class="control-item"><span class="control-key">F</span><span>선택/확대</span></div>
+            <div class="control-item"><span class="control-key">Enter</span><span>원본 보기</span></div>
+            <div class="control-item"><span class="control-key">ESC</span><span>닫기/커서 해제</span></div>
+        </div>
+    </div>
+
+    <div id="hint-toast" class="hint-toast hidden">선택한 작품을 크게 보려면 Enter 또는 F를 누르기</div>
+
+    <div id="image-modal" class="hidden" onclick="closeImageModal()">
+        <div class="image-modal-toolbar">
+            <button class="image-modal-btn" onclick="zoomModalImage(0.9); event.stopPropagation();">축소</button>
+            <button class="image-modal-btn" onclick="zoomModalImage(1.1); event.stopPropagation();">확대</button>
+            <button class="image-modal-btn" onclick="resetModalZoom(); event.stopPropagation();">원래 크기</button>
+            <div class="image-modal-title" id="image-modal-title">원본 이미지</div>
+            <button class="image-modal-btn" onclick="closeImageModal(); event.stopPropagation();">닫기</button>
+        </div>
+        <div class="image-modal-inner" onclick="event.stopPropagation();">
+            <img id="image-modal-img" src="" alt="확대 이미지">
         </div>
     </div>
 
@@ -441,17 +623,17 @@
         let moveForward = false, moveBackward = false, moveLeft = false, moveRight = false;
         let isPointerLocked = false;
         let currentArtworkIndex = 0;
+        let modalScale = 1;
 
         const cameraSpeed = 0.1;
         const lookSpeed = 0.002;
 
         function init() {
-            
             scene = new THREE.Scene();
             scene.fog = new THREE.Fog(0x0a0a0a, 1, 50);
             scene.background = new THREE.Color(0x0a0a0a);
 
-            camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+            camera = new THREE.PerspectiveCamera(70, window.innerWidth / window.innerHeight, 0.1, 1000);
             camera.position.set(0, 1.6, 0);
             camera.rotation.order = 'YXZ';
 
@@ -460,11 +642,8 @@
             renderer.setSize(window.innerWidth, window.innerHeight);
             renderer.shadowMap.enabled = true;
             renderer.shadowMap.type = THREE.PCFSoftShadowMap;
-
-
-            
             document.getElementById('canvas-container').appendChild(renderer.domElement);
-            
+
             createLights();
             createGallerySpace();
             createArtworks();
@@ -478,17 +657,19 @@
         }
 
         function createLights() {
-            scene.add(new THREE.AmbientLight(0xffffff, 0.6));
+            scene.add(new THREE.AmbientLight(0xffffff, 0.72));
 
             artworks.forEach((_, index) => {
                 const angle = (index / artworks.length) * Math.PI * 2;
-                const radius = 9;
+                const radius = 9.2;
 
-                const spotLight = new THREE.SpotLight(0xffffff, 0.6);
-                spotLight.position.set(Math.cos(angle) * radius * 0.8, 4, Math.sin(angle) * radius * 0.8);
+                const spotLight = new THREE.SpotLight(0xffffff, 0.95);
+                spotLight.position.set(Math.cos(angle) * radius * 0.78, 4.3, Math.sin(angle) * radius * 0.78);
                 spotLight.target.position.set(Math.cos(angle) * 12.8, 1.8, Math.sin(angle) * 12.8);
                 spotLight.angle = Math.PI / 6;
-                spotLight.penumbra = 0.3;
+                spotLight.penumbra = 0.32;
+                spotLight.decay = 1.4;
+                spotLight.distance = 18;
 
                 scene.add(spotLight);
                 scene.add(spotLight.target);
@@ -498,7 +679,7 @@
         function createGallerySpace() {
             const floor = new THREE.Mesh(
                 new THREE.CircleGeometry(15, 64),
-                new THREE.MeshStandardMaterial({ color: 0x1a1a1a, roughness: 0.8 })
+                new THREE.MeshStandardMaterial({ color: 0x1a1a1a, roughness: 0.85 })
             );
             floor.rotation.x = -Math.PI / 2;
             floor.receiveShadow = true;
@@ -506,7 +687,7 @@
 
             const walls = new THREE.Mesh(
                 new THREE.CylinderGeometry(13, 13, 7, 64, 1, true),
-                new THREE.MeshStandardMaterial({ color: 0x111111, side: THREE.BackSide })
+                new THREE.MeshStandardMaterial({ color: 0x101010, side: THREE.BackSide })
             );
             walls.position.y = 3;
             scene.add(walls);
@@ -517,50 +698,84 @@
 
             artworks.forEach((artwork, index) => {
                 const angle = (index / artworks.length) * Math.PI * 2;
-                const radius = 12.8;
+                const radius = 12.78;
                 const group = new THREE.Group();
 
-                const frame = new THREE.Mesh(
-                    new THREE.BoxGeometry(3.6, 2.9, 0.1),
-                    new THREE.MeshStandardMaterial({ color: 0xd4af37, roughness: 0.3, metalness: 0.8 })
+                loader.load(
+                    artwork.image,
+                    (texture) => {
+                        if ('colorSpace' in texture) {
+                            texture.colorSpace = THREE.SRGBColorSpace;
+                        } else {
+                            texture.encoding = THREE.sRGBEncoding;
+                        }
+
+                        texture.anisotropy = renderer.capabilities.getMaxAnisotropy();
+                        texture.minFilter = THREE.LinearFilter;
+                        texture.magFilter = THREE.LinearFilter;
+                        texture.generateMipmaps = false;
+                        texture.needsUpdate = true;
+
+                        const img = texture.image;
+                        const aspect = img.width / img.height;
+
+                        const maxHeight = 4.2;
+                        const maxWidth = 5.2;
+
+                        let imageWidth, imageHeight;
+
+                        if (aspect >= 1) {
+                            imageWidth = Math.min(maxWidth, maxHeight * aspect);
+                            imageHeight = imageWidth / aspect;
+                        } else {
+                            imageHeight = maxHeight;
+                            imageWidth = imageHeight * aspect;
+                        }
+
+                        const frameMargin = 0.16;
+
+                        const frame = new THREE.Mesh(
+                            new THREE.BoxGeometry(imageWidth + frameMargin * 2, imageHeight + frameMargin * 2, 0.12),
+                            new THREE.MeshStandardMaterial({
+                                color: 0xd4af37,
+                                roughness: 0.25,
+                                metalness: 0.82
+                            })
+                        );
+
+                        const image = new THREE.Mesh(
+                            new THREE.PlaneGeometry(imageWidth, imageHeight),
+                            new THREE.MeshBasicMaterial({ map: texture })
+                        );
+                        image.position.z = 0.071;
+
+                        group.add(frame);
+                        group.add(image);
+
+                        group.position.set(Math.cos(angle) * radius, 1.8, Math.sin(angle) * radius);
+                        group.lookAt(0, 1.8, 0);
+                        group.userData = { index, artwork, imageWidth, imageHeight };
+
+                        createArtworkLabel(artwork, group, imageHeight);
+
+                        artworkFrames.push(group);
+                        scene.add(group);
+                    },
+                    undefined,
+                    () => {
+                        console.log(`이미지 로드 실패: ${artwork.image}`);
+                    }
                 );
-
-               const texture = loader.load(artwork.image, () => {
-                    texture.colorSpace = THREE.SRGBColorSpace;
-                    texture.anisotropy = renderer.capabilities.getMaxAnisotropy();
-                    texture.minFilter = THREE.LinearFilter;
-                    texture.magFilter = THREE.LinearFilter;
-                    texture.generateMipmaps = false;
-                    texture.needsUpdate = true;
-                });
-                
-                const image = new THREE.Mesh(
-                    new THREE.PlaneGeometry(3.35, 2.65),
-                    new THREE.MeshBasicMaterial({ map: texture })
-                );
-                image.position.z = 0.06;
-
-                group.add(frame);
-                group.add(image);
-
-                group.position.set(Math.cos(angle) * radius, 1.8, Math.sin(angle) * radius);
-                group.lookAt(0, 1.8, 0);
-                group.userData = { index, artwork };
-
-                createArtworkLabel(artwork, group);
-
-                artworkFrames.push(group);
-                scene.add(group);
             });
         }
 
-        function createArtworkLabel(artwork, group) {
+        function createArtworkLabel(artwork, group, imageHeight) {
             const canvas = document.createElement('canvas');
             const ctx = canvas.getContext('2d');
             canvas.width = 512;
             canvas.height = 128;
 
-            ctx.fillStyle = 'rgba(0, 0, 0, 0.8)';
+            ctx.fillStyle = 'rgba(0, 0, 0, 0.84)';
             ctx.fillRect(0, 0, 512, 128);
 
             ctx.fillStyle = '#4ecdc4';
@@ -573,14 +788,14 @@
             ctx.fillText(artwork.date, 256, 90);
 
             const label = new THREE.Mesh(
-                new THREE.PlaneGeometry(1.5, 0.4),
+                new THREE.PlaneGeometry(1.8, 0.45),
                 new THREE.MeshBasicMaterial({
                     map: new THREE.CanvasTexture(canvas),
                     transparent: true
                 })
             );
 
-            label.position.set(0, -1.6, 0.1);
+            label.position.set(0, -(imageHeight / 2) - 0.42, 0.11);
             group.add(label);
         }
 
@@ -591,13 +806,20 @@
                 const dot = document.createElement('div');
                 dot.className = 'nav-dot';
                 dot.setAttribute('data-title', artwork.title);
-                dot.onclick = () => navigateToArtwork(i);
+                dot.onclick = () => navigateToArtwork(i, true);
                 container.appendChild(dot);
             });
         }
 
         function setupEventListeners() {
             document.addEventListener('keydown', (e) => {
+                if (e.code === 'Escape') {
+                    if (!document.getElementById('image-modal').classList.contains('hidden')) {
+                        closeImageModal();
+                        return;
+                    }
+                }
+
                 if (e.code === 'KeyW') moveForward = true;
                 if (e.code === 'KeyS') moveBackward = true;
                 if (e.code === 'KeyA') moveLeft = true;
@@ -606,16 +828,20 @@
                 if (isExhibitionStarted) {
                     if (e.code === 'KeyE') {
                         currentArtworkIndex = (currentArtworkIndex + 1) % artworks.length;
-                        navigateToArtwork(currentArtworkIndex);
+                        navigateToArtwork(currentArtworkIndex, false);
                     }
 
                     if (e.code === 'KeyQ') {
                         currentArtworkIndex = (currentArtworkIndex - 1 + artworks.length) % artworks.length;
-                        navigateToArtwork(currentArtworkIndex);
+                        navigateToArtwork(currentArtworkIndex, false);
                     }
 
                     if (e.code === 'KeyF') {
-                        selectArtworkAtCenter();
+                        selectArtworkAtCenter(true);
+                    }
+
+                    if (e.code === 'Enter') {
+                        openCurrentArtworkModal();
                     }
                 }
             });
@@ -652,7 +878,7 @@
                     return;
                 }
 
-                selectArtworkAtCenter();
+                selectArtworkAtCenter(false);
             });
 
             document.addEventListener('pointerlockchange', () => {
@@ -662,11 +888,18 @@
             window.addEventListener('resize', () => {
                 camera.aspect = window.innerWidth / window.innerHeight;
                 camera.updateProjectionMatrix();
+                renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
                 renderer.setSize(window.innerWidth, window.innerHeight);
             });
+
+            document.getElementById('image-modal-img').addEventListener('wheel', (e) => {
+                e.preventDefault();
+                const factor = e.deltaY < 0 ? 1.08 : 0.92;
+                zoomModalImage(factor);
+            }, { passive: false });
         }
 
-        function selectArtworkAtCenter() {
+        function selectArtworkAtCenter(openModalAfterSelect = false) {
             const ray = new THREE.Raycaster();
             ray.setFromCamera(new THREE.Vector2(0, 0), camera);
 
@@ -681,14 +914,14 @@
 
                 if (obj.userData.artwork) {
                     currentArtworkIndex = obj.userData.index;
-                    navigateToArtwork(currentArtworkIndex);
-                    showArtworkInfo(obj.userData.artwork);
+                    navigateToArtwork(currentArtworkIndex, openModalAfterSelect);
                 }
             }
         }
 
         function updateCamera() {
             if (!isExhibitionStarted) return;
+            if (!document.getElementById('image-modal').classList.contains('hidden')) return;
 
             const dir = new THREE.Vector3();
             camera.getWorldDirection(dir);
@@ -712,26 +945,38 @@
             }
 
             camera.position.y = currentHeight;
-
             updateNavigationDots();
         }
 
-        function navigateToArtwork(index) {
+        function navigateToArtwork(index, openModal = false) {
             currentArtworkIndex = index;
-            const targetFrame = artworkFrames[index];
-            const angle = (index / artworks.length) * Math.PI * 2;
 
-            const viewDistance = 6.2;
+            const targetFrame = artworkFrames.find(f => f.userData && f.userData.index === index);
+            if (!targetFrame) return;
+
+            const angle = (index / artworks.length) * Math.PI * 2;
+            const targetWidth = targetFrame.userData.imageWidth || 3.5;
+            const targetHeight = targetFrame.userData.imageHeight || 4.2;
+
+            const dynamicDistance = Math.max(5.6, Math.min(7.2, 4.9 + Math.max(targetWidth, targetHeight) * 0.45));
+
             const newPos = new THREE.Vector3(
-                Math.cos(angle) * viewDistance,
+                Math.cos(angle) * dynamicDistance,
                 1.6,
-                Math.sin(angle) * viewDistance
+                Math.sin(angle) * dynamicDistance
             );
 
             camera.position.copy(newPos);
             camera.lookAt(targetFrame.position.x, 1.8, targetFrame.position.z);
 
             showArtworkInfo(artworks[index]);
+            flashHint();
+
+            if (openModal) {
+                setTimeout(() => {
+                    openImageModal(artworks[index]);
+                }, 180);
+            }
         }
 
         function showArtworkInfo(artwork) {
@@ -768,7 +1013,53 @@
             isExhibitionStarted = true;
             document.getElementById('entrance-guide').classList.add('hidden');
             renderer.domElement.requestPointerLock();
-            navigateToArtwork(0);
+            setTimeout(() => navigateToArtwork(0, false), 120);
+        }
+
+        function openCurrentArtworkModal() {
+            const artwork = artworks[currentArtworkIndex];
+            if (!artwork) return;
+            openImageModal(artwork);
+        }
+
+        function openImageModal(artwork) {
+            const modal = document.getElementById('image-modal');
+            const img = document.getElementById('image-modal-img');
+            const title = document.getElementById('image-modal-title');
+
+            modalScale = 1;
+            img.style.transform = `scale(${modalScale})`;
+            img.src = artwork.image;
+            title.textContent = `${artwork.title} · ${artwork.category} · 원본 이미지`;
+            modal.classList.remove('hidden');
+
+            if (document.pointerLockElement) {
+                document.exitPointerLock();
+            }
+        }
+
+        function closeImageModal() {
+            document.getElementById('image-modal').classList.add('hidden');
+            resetModalZoom();
+        }
+
+        function zoomModalImage(multiplier) {
+            modalScale = Math.max(0.6, Math.min(4, modalScale * multiplier));
+            document.getElementById('image-modal-img').style.transform = `scale(${modalScale})`;
+        }
+
+        function resetModalZoom() {
+            modalScale = 1;
+            document.getElementById('image-modal-img').style.transform = `scale(${modalScale})`;
+        }
+
+        function flashHint() {
+            const toast = document.getElementById('hint-toast');
+            toast.classList.remove('hidden');
+            clearTimeout(flashHint._timer);
+            flashHint._timer = setTimeout(() => {
+                toast.classList.add('hidden');
+            }, 1800);
         }
 
         function animate() {
